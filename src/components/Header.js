@@ -1,11 +1,18 @@
-import logo from "../images/header.svg";
+import React from "react";
+import headerLogo from "../images/header.svg";
+import NavBar from "./NavBar";
 
-function Header() {
+const Header = ({ isLoggedIn, handleLogout, user }) => {
   return (
-    <header className="header">
-      <img src={logo} alt="Around US" className="header__image" />
+    <header className='header'>
+      <img className='header__image' alt='Around the U.S. logo' src={headerLogo} />
+      <NavBar
+        isLoggedIn={isLoggedIn}
+        handleLogout={handleLogout}
+        user={user}
+      />
     </header>
   );
-}
+};
 
 export default Header;
