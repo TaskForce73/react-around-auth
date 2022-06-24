@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Login = (props) => {
   const { onSubmit } = props;
-  const [values, setValues] = useState({});
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-  const handleChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
+  const handleChangeEmail = (e) => {
+    const { value } = e.target;
+    setEmail(value);
+  };
+
+  const handleChangePassword = (e) => {
+    const { value } = e.target;
+    setPassword(value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ email: values.email, password: values.password });
+    onSubmit(password, email);
   };
 
   return (
@@ -23,8 +30,8 @@ const Login = (props) => {
           type="email"
           placeholder="Email"
           name="email"
-          onChange={handleChange}
-          value={values.email || ''}
+          onChange={handleChangeEmail}
+          value={email}
           required
         />
         <input
@@ -32,8 +39,8 @@ const Login = (props) => {
           type="password"
           placeholder="Password"
           name="password"
-          onChange={handleChange}
-          value={values.password || ''}
+          onChange={handleChangePassword}
+          value={password}
           required
         />
         <button className="form__submit" type="submit">

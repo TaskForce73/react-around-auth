@@ -18,7 +18,6 @@ import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 
 function App() {
   const navigate = useNavigate();
-
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
@@ -35,7 +34,7 @@ function App() {
   const [changePopupButtonText, setChangePopupButtonText] = React.useState('');
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isRegistered, setIsRegistered] = React.useState(false);
-  const [values, setValues] = React.useState({ email: "", password: "" });
+  const [userEmail, setUserEmail] = React.useState('');
 
   function handleEditProfileClick() {
     setChangePopupButtonText('Save');
@@ -87,8 +86,8 @@ function App() {
     setChangePopupButtonText('Saving...');
     api
       .editProfile(data)
-      .then((currentUser) => {
-        setCurrentUser(currentUser);
+      .then((data) => {
+        setCurrentUser(data);
       })
       .then(() => {
         setIsEditProfilePopupOpen(false);
@@ -102,8 +101,8 @@ function App() {
     setChangePopupButtonText('Saving...');
     api
       .changeAvatar(avatar)
-      .then((currentUser) => {
-        setCurrentUser(currentUser);
+      .then((data) => {
+        setCurrentUser(data);
       })
       .then(() => {
         setIsEditAvatarPopupOpen(false);
@@ -169,29 +168,29 @@ function App() {
       });
   }
 
-  function handleLogin({ email, password }) {
-    authorize({ email, password })
+  const handleLogin = (password, email) => {
+    authorize(password, email)
       .then((user) => {
         if (user) {
           localStorage.setItem('jwt', user.token);
           setIsLoggedIn(true);
-          setCurrentUser(email);
+          setUserEmail(email);
           navigate('/');
         } else {
           setIsInfoToolTipPopupOpen(true);
-          throw new Error('No token recieved!');
+          throw new Error('Invalid token');
         }
       })
       .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
 
-  function handleRegister({ email, password }) {
-    register({ email, password })
-      .then((user) => {
-        navigate('./signin');
+  const handleRegister = (email, password) => {
+    register(email, password)
+      .then(() => {
         setIsRegistered(true);
+        navigate('./signin');
       })
       .catch((err) => {
         console.log(err);
@@ -200,25 +199,26 @@ function App() {
       .finally(() => {
         setIsInfoToolTipPopupOpen(true);
       });
-  }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
-    token &&
+    if (token) {
       validateToken(token)
         .then((res) => {
-          setValues(res.data.email);
+          setUserEmail(res.data.email);
           setIsLoggedIn(true);
           navigate('/');
         })
         .catch((err) => {
           console.log(err);
         });
+    }
   }, []);
 
   function handleLogout() {
     localStorage.removeItem('jwt');
-    setValues("");
+    setUserEmail('');
     setIsLoggedIn(false);
     navigate('/signin');
   }
@@ -226,15 +226,21 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="main">
-        <Header isLoggedIn={isLoggedIn} handleLogout={handleLogout} user={values}/>
+        <Header
+          isLoggedIn={isLoggedIn}
+          handleLogout={handleLogout}
+          userEmail={userEmail}
+        />
         <Routes>
           <Route
             path="/signin"
-            element={<Login onSubmit={handleLogin} isLoggedIn />}
+            element={<Login onSubmit={handleLogin} isLoggedIn={isLoggedIn} />}
           />
           <Route
             path="/signup"
-            element={<Register onSubmit={handleRegister} isLoggedIn />}
+            element={
+              <Register onSubmit={handleRegister} isLoggedIn={isLoggedIn} />
+            }
           />
           <Route
             path="/"
@@ -255,8 +261,8 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Footer />
-        
-          <AddPlacePopup
+
+        <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
           onAddPlaceSubmit={handleAddPlaceSubmit}
@@ -286,7 +292,7 @@ function App() {
           card={selectedCard}
         />
         <InfoToolTip
-          name={'registration'}
+          name="info"
           onClose={closeAllPopups}
           status={isRegistered}
           isOpen={isInfoToolTipPopupOpen}

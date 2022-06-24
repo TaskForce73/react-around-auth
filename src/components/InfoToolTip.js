@@ -8,7 +8,7 @@ function InfoToolTip(props) {
         props.isOpen && 'popup_open'
       } `}
     >
-      <div className="popup__body">
+      <div className="popup__alert">
         <button
           aria-label="close"
           type="button"
