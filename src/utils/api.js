@@ -5,7 +5,7 @@ class Api {
   }
 
   _checkResponse(res) {
-    return res.ok ? res.json() : Promise.reject("Error!" + res.statusText);
+   return res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
   }
 
   getInitialCards() {

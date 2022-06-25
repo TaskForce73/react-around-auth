@@ -171,18 +171,14 @@ function App() {
   const handleLogin = (password, email) => {
     authorize(password, email)
       .then((user) => {
-        if (user) {
           localStorage.setItem('jwt', user.token);
           setIsLoggedIn(true);
           setUserEmail(email);
           navigate('/');
-        } else {
-          setIsInfoToolTipPopupOpen(true);
-          throw new Error('Invalid token');
-        }
       })
       .catch((err) => {
         console.log(err);
+        setIsInfoToolTipPopupOpen(true);
       });
   };
 

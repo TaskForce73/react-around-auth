@@ -21,7 +21,7 @@ function Main({
             style={{ backgroundImage: `url(${currentUser.avatar})` }}
             aria-label="avatar"
             className="profile__image"
-          ></div>
+          />
         )}
         <div className="profile__info">
           <h1 className="profile__author">{currentUser.name}</h1>
